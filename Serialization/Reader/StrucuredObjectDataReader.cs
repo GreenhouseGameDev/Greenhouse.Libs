@@ -12,24 +12,52 @@ public record StructuredObjectDataReader(StructuredValue Value) : DataReader {
     public ObjectDataReader Object()
         => new ObjectReader(this, (StructuredValue.Object) Value);
 
-    public class ObjectReader(StructuredObjectDataReader reader, StructuredValue.Object obj) : ObjectDataReader {
+    private class ObjectReader(StructuredObjectDataReader reader, StructuredValue.Object obj) : ObjectDataReader {
         private readonly StructuredObjectDataReader Reader = reader;
         private readonly StructuredValue.Object Obj = obj;
 
-        public override DataReader End()
-            => Reader;
+        public override void End() {}
 
         public override DataReader Field(string name)
             => new StructuredObjectDataReader(Obj.Values[name]);
+
+        public override NullableFieldDataReader NullableField(string name) {
+            if (!Obj.Values.ContainsKey(name))
+                return new NullFieldReader(name);
+            var value = Obj.Values[name];
+            if (value is StructuredValue.Primitive.Null)
+                return new NullFieldReader(name);
+            return new NotNullFieldReader(new StructuredObjectDataReader(value));
+        }
     }
 
-    public class ArrayReader(StructuredObjectDataReader reader, StructuredValue.Array arr) : ArrayDataReader {
+    private class NotNullFieldReader(StructuredObjectDataReader reader) : NullableFieldDataReader {
+        public override void End() {}
+        public override bool IsNull()
+            => false;
+        public override DataReader NotNull()
+            => reader;
+    }
+
+    private class NullFieldReader(string fieldName) : NullableFieldDataReader {
+        private readonly string FieldName = fieldName;
+
+        public override void End() {}
+
+        public override bool IsNull()
+            => true;
+
+        public override DataReader NotNull() {
+            throw new ArgumentException($"Field {FieldName} is null");
+        }
+    }
+
+    private class ArrayReader(StructuredObjectDataReader reader, StructuredValue.Array arr) : ArrayDataReader {
         private readonly StructuredObjectDataReader Reader = reader;
         private readonly StructuredValue.Array Arr = arr;
         private int index = 0;
 
-        public override DataReader End()
-            => Reader;
+        public override void End() {}
 
         public override int Length()
             => Arr.Values.Length;
@@ -38,7 +66,7 @@ public record StructuredObjectDataReader(StructuredValue Value) : DataReader {
             => new StructuredObjectDataReader(Arr.Values[index++]);
     }
 
-    public class PrimitiveReader(StructuredValue.Primitive prim) : PrimitiveDataReader {
+    private class PrimitiveReader(StructuredValue.Primitive prim) : PrimitiveDataReader {
         private readonly StructuredValue.Primitive Prim = prim;
 
         public bool Bool() 

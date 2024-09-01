@@ -51,6 +51,9 @@ public record JsonStructuredReader(JsonReader Reader) : StructuredReader {
             case JsonToken.Boolean: {
                 return new StructuredValue.Primitive.Bool((bool)Reader.Value!);
             }
+            case JsonToken.Null: {
+                return new StructuredValue.Primitive.Null();
+            }
         }
 
         throw new Exception($"Unexpected JSON token: {Reader.TokenType}");

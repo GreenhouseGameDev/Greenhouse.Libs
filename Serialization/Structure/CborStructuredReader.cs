@@ -51,6 +51,10 @@ public record CborStructuredReader(CborReader Reader) : StructuredReader {
             case CborReaderState.Boolean: {
                 return new StructuredValue.Primitive.Bool(Reader.ReadBoolean());
             }
+            case CborReaderState.Null: {
+                Reader.ReadNull();
+                return new StructuredValue.Primitive.Null();
+            }
         }
 
         throw new Exception($"Unexpected CBOR token: {Reader.PeekState()}");

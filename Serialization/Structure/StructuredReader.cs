@@ -18,6 +18,7 @@ public abstract record StructuredValue {
         public record Float(float Value) : Primitive;
         public record Double(double Value) : Primitive;
         public record String(string Value) : Primitive;
+        public record Null : Primitive;
     }
 
     public record Array(StructuredValue[] Values) : StructuredValue {

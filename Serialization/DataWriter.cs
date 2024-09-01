@@ -8,7 +8,19 @@ public interface DataWriter {
 
 public abstract class ObjectDataWriter : IDisposable {
     public abstract DataWriter Field(string name);
-    public abstract DataWriter End();
+    public abstract NullableFieldDataWriter NullableField(string name);
+    public abstract void End();
+
+    public void Dispose() {
+        GC.SuppressFinalize(this);
+        End();
+    }
+}
+
+public abstract class NullableFieldDataWriter : IDisposable {
+    public abstract DataWriter NotNull();
+    public abstract void Null();
+    public abstract void End();
 
     public void Dispose() {
         GC.SuppressFinalize(this);
@@ -18,7 +30,7 @@ public abstract class ObjectDataWriter : IDisposable {
 
 public abstract class ArrayDataWriter : IDisposable {
     public abstract DataWriter Value();
-    public abstract DataWriter End();
+    public abstract void End();
 
     public void Dispose() {
         GC.SuppressFinalize(this);

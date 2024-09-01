@@ -20,9 +20,8 @@ public record CborDataWriter(CborWriter Cbor) : DataWriter {
     private class ArrayWriter(CborDataWriter writer) : ArrayDataWriter {
         private readonly CborDataWriter Writer = writer;
 
-        public override DataWriter End() {
+        public override void End() {
             Writer.Cbor.WriteEndArray();
-            return Writer;
         }
 
         public override DataWriter Value() {
@@ -33,15 +32,31 @@ public record CborDataWriter(CborWriter Cbor) : DataWriter {
     private class ObjectWriter(CborDataWriter writer) : ObjectDataWriter {
         private readonly CborDataWriter Writer = writer;
 
-        public override DataWriter End() {
+        public override void End() {
             Writer.Cbor.WriteEndMap();
-            return Writer;
         }
 
         public override DataWriter Field(string name) {
             Writer.Cbor.WriteTextString(name);
             return Writer;
         }
+
+        public override NullableFieldDataWriter NullableField(string name) {
+            Writer.Cbor.WriteTextString(name);
+            return new NullableWriter(Writer);
+        }
+    }
+
+    private class NullableWriter(CborDataWriter writer) : NullableFieldDataWriter {
+        private readonly CborDataWriter Writer = writer;
+
+        public override void End() {}
+
+        public override DataWriter NotNull()
+            => Writer;
+
+        public override void Null()
+            => Writer.Cbor.WriteNull();
     }
 
     private record PrimitiveWriter(CborDataWriter Writer) : PrimitiveDataWriter {

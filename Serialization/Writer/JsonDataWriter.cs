@@ -20,9 +20,8 @@ public record JsonDataWriter(JsonWriter Json) : DataWriter {
     private class ArrayWriter(JsonDataWriter writer) : ArrayDataWriter {
         private readonly JsonDataWriter Writer = writer;
 
-        public override DataWriter End() {
+        public override void End() {
             Writer.Json.WriteEndArray();
-            return Writer;
         }
 
         public override DataWriter Value() {
@@ -33,15 +32,31 @@ public record JsonDataWriter(JsonWriter Json) : DataWriter {
     private class ObjectWriter(JsonDataWriter writer) : ObjectDataWriter {
         private readonly JsonDataWriter Writer = writer;
 
-        public override DataWriter End() {
+        public override void End() {
             Writer.Json.WriteEndObject();
-            return Writer;
         }
 
         public override DataWriter Field(string name) {
             Writer.Json.WritePropertyName(name);
             return Writer;
         }
+
+        public override NullableFieldDataWriter NullableField(string name) {
+            Writer.Json.WritePropertyName(name);
+            return new NullableWriter(Writer);
+        }
+    }
+
+    private class NullableWriter(JsonDataWriter writer) : NullableFieldDataWriter {
+        private readonly JsonDataWriter Writer = writer;
+
+        public override void End() {}
+
+        public override DataWriter NotNull()
+            => Writer;
+
+        public override void Null()
+            => Writer.Json.WriteNull();
     }
 
     private record PrimitiveWriter(JsonDataWriter Writer) : PrimitiveDataWriter {

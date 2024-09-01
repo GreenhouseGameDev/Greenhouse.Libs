@@ -8,7 +8,19 @@ public interface DataReader {
 
 public abstract class ObjectDataReader : IDisposable {
     public abstract DataReader Field(string name);
-    public abstract DataReader End();
+    public abstract NullableFieldDataReader NullableField(string name);
+    public abstract void End();
+
+    public void Dispose() {
+        GC.SuppressFinalize(this);
+        End();
+    }
+}
+
+public abstract class NullableFieldDataReader : IDisposable {
+    public abstract DataReader NotNull();
+    public abstract bool IsNull();
+    public abstract void End();
 
     public void Dispose() {
         GC.SuppressFinalize(this);
@@ -20,7 +32,7 @@ public abstract class ArrayDataReader : IDisposable {
     public abstract int Length();
 
     public abstract DataReader Value();
-    public abstract DataReader End();
+    public abstract void End();
 
     public void Dispose() {
         GC.SuppressFinalize(this);
