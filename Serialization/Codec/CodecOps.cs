@@ -16,8 +16,8 @@ public interface CodecOps<T> where T : notnull {
     DataResult<U> Error<U>(string message, T input) where U : notnull;
 
     T Empty() => Create(DBNull.Value);
-    IListBuilder<T> ListBuilder();
-    IRecordBuilder<T> RecordBuilder();
+    ListBuilder<T> ListBuilder();
+    RecordBuilder<T> RecordBuilder();
 
     DataResult<bool> AsBool(T input) => Get(input).SelectWithError(v => v.ToBoolean(CultureInfo.InvariantCulture), ex => Error<bool>(ex.Message, input));
     DataResult<double> AsDouble(T input) => Get(input).SelectWithError(v => v.ToDouble(CultureInfo.InvariantCulture), ex => Error<double>(ex.Message, input));

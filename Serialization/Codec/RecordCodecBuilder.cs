@@ -19,7 +19,7 @@ internal class TestCodec : MapCodec<int> {
         throw new NotImplementedException();
     }
 
-    public IRecordBuilder<T> Encode<T>(int input, IRecordBuilder<T> builder) where T : notnull {
+    public RecordBuilder<T> Encode<T>(int input, RecordBuilder<T> builder) where T : notnull {
         throw new NotImplementedException();
     }
 }
@@ -45,7 +45,7 @@ internal class RecordCodecDecoder<A, R>(MapDecoder<Func<A, R>> instance, MapDeco
 }
 
 internal class RecordCodecEncoder<A, R>(A item, MapEncoder<A> itemEncoder, MapEncoder<Func<A, R>> finalEncoder) : MapEncoder<R> where A : notnull where R : notnull {
-    public IRecordBuilder<T> Encode<T>(R input, IRecordBuilder<T> builder) where T : notnull {
+    public RecordBuilder<T> Encode<T>(R input, RecordBuilder<T> builder) where T : notnull {
         itemEncoder.Encode(item, builder);
         finalEncoder.Encode(a => input, builder);
         return builder;
@@ -65,7 +65,7 @@ public class RecordCodec<A>(RecordCodecBuilder<A, A> builder) : MapCodec<A> wher
         return Builder.Decoder.Decode(dictionary);
     }
 
-    public IRecordBuilder<T> Encode<T>(A input, IRecordBuilder<T> builder) where T : notnull {
+    public RecordBuilder<T> Encode<T>(A input, RecordBuilder<T> builder) where T : notnull {
         return Builder.Encoder(input).Encode(input, builder);
     }
 }

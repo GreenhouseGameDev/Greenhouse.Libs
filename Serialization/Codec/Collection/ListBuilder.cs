@@ -2,13 +2,13 @@
 
 namespace Greenhouse.Libs.Serialization.Codec.Collection;
 
-public interface IListBuilder<T> where T : notnull {
+public interface ListBuilder<T> where T : notnull {
     CodecOps<T> Ops { get; }
-    IRecordBuilder<T> Add(T value);
-    IRecordBuilder<T> WithErrorsFrom<E>(DataResult<E> error) where E : notnull;
+    RecordBuilder<T> Add(T value);
+    RecordBuilder<T> WithErrorsFrom<E>(DataResult<E> error) where E : notnull;
     DataResult<T> Build();
 
-    IRecordBuilder<T> Add(DataResult<T> value) {
+    RecordBuilder<T> Add(DataResult<T> value) {
         return value.Apply(Add, e => WithErrorsFrom(DataResult.Error<string>(e)));
     }
 }
