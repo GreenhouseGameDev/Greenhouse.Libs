@@ -1,0 +1,12 @@
+<Project>
+
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.3"/>
+    <PackageVersion Include="System.Formats.Cbor" Version="8.0.0" />
+  </ItemGroup>
+
+</Project>
