@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Greenhouse.Libs.Serialization.Io.Writer;
+namespace Greenhouse.Libs.Serialization.Writer;
 
 public record JsonDataWriter(JsonWriter Json) : DataWriter {
     public ObjectDataWriter Object(int keys) {

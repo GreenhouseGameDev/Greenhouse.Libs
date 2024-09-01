@@ -1,6 +1,6 @@
 using System.Formats.Cbor;
 
-namespace Greenhouse.Libs.Serialization.Io.Writer;
+namespace Greenhouse.Libs.Serialization.Writer;
 
 public record CborDataWriter(CborWriter Cbor) : DataWriter {
     public ObjectDataWriter Object(int keys) {

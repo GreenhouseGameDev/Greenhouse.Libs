@@ -1,4 +1,4 @@
-namespace Greenhouse.Libs.Serialization.Io;
+namespace Greenhouse.Libs.Serialization;
 
 public interface DataReader {
     public ObjectDataReader Object();

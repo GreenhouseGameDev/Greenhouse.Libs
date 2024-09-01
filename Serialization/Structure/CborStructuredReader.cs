@@ -1,7 +1,7 @@
 
 using System.Formats.Cbor;
 
-namespace Greenhouse.Libs.Serialization.Io.Structure;
+namespace Greenhouse.Libs.Serialization.Structure;
 
 public record CborStructuredReader(CborReader Reader) : StructuredReader {
     public StructuredValue ReadValue() {

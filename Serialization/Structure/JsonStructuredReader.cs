@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace Greenhouse.Libs.Serialization.Io.Structure;
+namespace Greenhouse.Libs.Serialization.Structure;
 
 public record JsonStructuredReader(JsonReader Reader) : StructuredReader {
     public StructuredValue ReadValue() {

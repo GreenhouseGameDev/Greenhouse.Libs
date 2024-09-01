@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Greenhouse.Libs.Serialization.Io.Structure;
+namespace Greenhouse.Libs.Serialization.Structure;
 
 public interface StructuredReader {
     public StructuredValue ReadValue();

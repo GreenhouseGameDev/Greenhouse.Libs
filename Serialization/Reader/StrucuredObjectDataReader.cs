@@ -1,6 +1,6 @@
-using Greenhouse.Libs.Serialization.Io.Structure;
+using Greenhouse.Libs.Serialization.Structure;
 
-namespace Greenhouse.Libs.Serialization.Io.Reader;
+namespace Greenhouse.Libs.Serialization.Reader;
 
 public record StructuredObjectDataReader(StructuredValue Value) : DataReader {
     public ArrayDataReader Array()
