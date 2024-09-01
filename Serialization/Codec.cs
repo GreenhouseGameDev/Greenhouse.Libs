@@ -1,3 +1,5 @@
+using System.Numerics;
+
 namespace Greenhouse.Libs.Serialization;
 
 public readonly struct Unit;
@@ -89,6 +91,28 @@ public static class CodecExtensions {
     
     public static FieldCodec<TValue?, TParent> NullableField<TValue, TParent>(this Codec<TValue> codec, string name, Func<TParent, TValue?> getter) where TValue : class?
         => new NullableClassFieldCodec<TValue, TParent>(codec, name, getter);
+}
+
+public record StringEnumCodec<TValue> : Codec<TValue> where TValue : struct, Enum {
+    public override TValue ReadGeneric(DataReader reader) {
+        var value = reader.Primitive().String();
+        if (Enum.TryParse<TValue>(value, out var result))
+            return result;
+        throw new ArgumentException($"Invalid enum! Got {value} for type {typeof(TValue)}");
+    }
+
+    public override void WriteGeneric(DataWriter writer, TValue value) {
+        writer.Primitive().String(value.ToString());
+    }
+}
+
+public record IntEnumCodec<TValue, TParent>(Codec<TParent> Parent) : Codec<TValue> where TValue : struct, Enum where TParent : struct, IBinaryInteger<TParent>, IBinaryNumber<TParent>, INumber<TParent>, INumberBase<TParent> {
+    public override TValue ReadGeneric(DataReader reader)
+        => (TValue) Enum.ToObject(typeof(TValue), Parent.ReadGeneric(reader));
+
+    public override void WriteGeneric(DataWriter writer, TValue value) {
+        Parent.WriteGeneric(writer, (TParent)Convert.ChangeType(value, typeof(TParent)));
+    }
 }
 
 internal record PrimitiveImplCodec<TValue>(Func<DataReader, TValue> ReadFunc, Action<DataWriter, TValue> WriteFunc) : Codec<TValue> {
