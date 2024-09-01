@@ -4,8 +4,8 @@ namespace Greenhouse.Libs.Serialization.Result
 {
     public static class Either
     {
-        public static Either<L, R> Left<L, R>(L value) where L : notnull where R : notnull => new Either<L, R>(Optional.Of(value), Optional.Empty<R>());
-        public static Either<L, R> Right<L, R>(R value) where L : notnull where R : notnull => new Either<L, R>(Optional.Empty<L>(), Optional.Of(value));
+        public static Either<L, R> Left<L, R>(L value) where L : notnull where R : notnull => new(Optional.Of(value), Optional.Empty<R>());
+        public static Either<L, R> Right<L, R>(R value) where L : notnull where R : notnull => new(Optional.Empty<L>(), Optional.Of(value));
     }
 
     public readonly struct Either<L, R> where L : notnull where R : notnull

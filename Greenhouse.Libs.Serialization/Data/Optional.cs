@@ -4,7 +4,7 @@ namespace Greenhouse.Libs.Serialization.Data
 {
     public static class Optional
     {
-        public static Optional<R> Of<R>(R value) where R : notnull => new Optional<R>(value);
+        public static Optional<R> Of<R>(R value) where R : notnull => new(value);
         public static Optional<R> OfNullable<R>(R? value) where R : notnull => value == null ? Empty<R>() : Of(value);
         public static Optional<R> OfNullable<R>(R? value) where R : struct => value.HasValue ? Of(value.Value) : Empty<R>();
         public static Optional<R> Empty<R>() where R : notnull => default;
@@ -13,12 +13,13 @@ namespace Greenhouse.Libs.Serialization.Data
     public readonly struct Optional<R> : IEnumerable<R> where R : notnull
     {
         private readonly R? _value;
-        public readonly bool HasValue => _value is not null;
+        public readonly bool HasValue => _value != null;
 
         public Optional(R? value) 
         {
-            _value = value; 
+            _value = value;
         }
+        
         public R Get()
         {
             if (!HasValue)
