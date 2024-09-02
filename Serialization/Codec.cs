@@ -211,10 +211,46 @@ public record NotNullFieldCodec<TValue, TParent>(Codec<TValue> Codec, string Nam
         => Codec.WriteGeneric(writer.Field(Name), value);
 }
 
+public record struct Variant<TKey, TResult>(TKey type, TResult value);
+
+public record VariantCodec<TKey, TResult>(Codec<TKey> KeyCodec, Func<TKey, Codec<TResult>> Resolver, string TypeField = "type", string ValueField = "value") : Codec<Variant<TKey, TResult>> {
+    public override Variant<TKey, TResult> ReadGeneric(DataReader reader) {
+        using var obj = reader.Object();
+        var key = KeyCodec.ReadGeneric(obj.Field(TypeField));
+        var resolved = Resolver(key);
+        var value = resolved.ReadGeneric(obj.Field(ValueField));
+        return new(key, value);
+    }
+
+    public override void WriteGeneric(DataWriter writer, Variant<TKey, TResult> value) {
+        var resolved = Resolver(value.type);
+        using var obj = writer.Object(2);
+        KeyCodec.WriteGeneric(writer, value.type);
+        resolved.WriteGeneric(writer, value.value);
+    }
+}
+
+public record RecordVariantCodec<TKey, TResult>(Codec<TKey> KeyCodec, Func<TKey, RecordCodec<TResult>> Resolver, string TypeField = "type") : Codec<Variant<TKey, TResult>> {
+    public override Variant<TKey, TResult> ReadGeneric(DataReader reader) {
+        using var obj = reader.Object();
+        var key = KeyCodec.ReadGeneric(obj.Field(TypeField));
+        var resolved = Resolver(key);
+        var value = resolved.ReadInline(obj);
+        return new(key, value);
+    }
+    
+    public override void WriteGeneric(DataWriter writer, Variant<TKey, TResult> value) {
+        var resolved = Resolver(value.type);
+        using var obj = writer.Object(1 + resolved.FieldCount);
+        KeyCodec.WriteGeneric(writer, value.type);
+        resolved.WriteGeneric(writer, value.value);
+    }
+}
 
 public record RecordCodec<TValue> : Codec<TValue> {
     private readonly FieldCodec[] Fields;
     private readonly Delegate Constructor;
+    public int FieldCount => Fields.Length;
 
     private RecordCodec(FieldCodec[] fields, Delegate contructor) {
         Fields = fields;
@@ -273,6 +309,10 @@ public record RecordCodec<TValue> : Codec<TValue> {
     public override TValue ReadGeneric(DataReader reader) {
         using var obj = reader.Object();
 
+        return ReadInline(obj);
+    }
+
+    public TValue ReadInline(ObjectDataReader obj) {
         object?[] values = new object[Fields.Length];
 
         for (int i = 0; i < Fields.Length; i++)
@@ -283,6 +323,10 @@ public record RecordCodec<TValue> : Codec<TValue> {
 
     public override void WriteGeneric(DataWriter writer, TValue value) {
         using var obj = writer.Object(Fields.Length);
+        WriteInline(obj, value);
+    }
+
+    public void WriteInline(ObjectDataWriter obj, TValue value) {
         for (int i = 0; i < Fields.Length; i++) {
             var field = Fields[i];
             field.Write(obj, field.GetFromParent(value));
