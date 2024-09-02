@@ -5,10 +5,7 @@ namespace Greenhouse.Libs.Serialization;
 public readonly struct Unit;
 
 public static class Codecs {
-    public static readonly Codec<Unit> Unit = new PrimitiveImplCodec<Unit>(
-        reader => new(),
-        (writer, value) => {}
-    );
+    public static readonly Codec<Unit> Unit = new UnitCodec<Unit>(() => new());
     public static readonly Codec<bool> Bool = new PrimitiveImplCodec<bool>(
         reader => reader.Primitive().Bool(),
         (writer, value) => writer.Primitive().Bool(value)
@@ -83,6 +80,13 @@ public abstract record Codec<TValue> : Codec {
 
     public object? Read(DataReader reader)
         => ReadGeneric(reader);
+}
+
+public record UnitCodec<TValue>(Func<TValue> Constructor) : Codec<TValue> {
+    public override TValue ReadGeneric(DataReader reader)
+        => Constructor();
+    
+    public override void WriteGeneric(DataWriter writer, TValue value) {}
 }
 
 public static class CodecExtensions {
