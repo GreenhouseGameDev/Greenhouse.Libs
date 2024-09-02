@@ -2,11 +2,13 @@
 
   <PropertyGroup>
     <OutputType>library</OutputType>
+    <VersionPrefix>0.1.0</VersionPrefix>
     <RootNamespace>Greenhouse.Libs.Serialization</RootNamespace>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>serialization;codec;binary data;json;cbor;data</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
