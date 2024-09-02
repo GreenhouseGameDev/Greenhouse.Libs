@@ -1,5 +1,6 @@
 <Project>
   <PropertyGroup>
     <NoWarn>IDE1006</NoWarn>
+    <VersionPrefix>0.1.0</VersionPrefix>
   </PropertyGroup>
 </Project>
