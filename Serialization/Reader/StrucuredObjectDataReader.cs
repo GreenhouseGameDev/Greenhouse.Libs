@@ -5,6 +5,9 @@ namespace Greenhouse.Libs.Serialization.Reader;
 public record StructuredObjectDataReader(StructuredValue Value) : DataReader {
     public ArrayDataReader Array()
         => new ArrayReader(this, (StructuredValue.Array) Value);
+        
+    public ArrayDataReader FixedArray(int length)
+        => new ArrayReader(this, (StructuredValue.Array) Value);
 
     public PrimitiveDataReader Primitive()
         => new PrimitiveReader((StructuredValue.Primitive) Value);

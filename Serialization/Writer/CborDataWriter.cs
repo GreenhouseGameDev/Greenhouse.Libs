@@ -17,6 +17,11 @@ public record CborDataWriter(CborWriter Cbor) : DataWriter {
         return new ArrayWriter(this);
     }
 
+    public ArrayDataWriter FixedArray(int length) {
+        Cbor.WriteStartArray(length);
+        return new ArrayWriter(this);
+    }
+
     private class ArrayWriter(CborDataWriter writer) : ArrayDataWriter {
         private readonly CborDataWriter Writer = writer;
 

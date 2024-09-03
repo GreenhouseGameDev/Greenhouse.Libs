@@ -58,6 +58,10 @@ public static class Codecs {
         reader => reader.Primitive().String(),
         (writer, value) => writer.Primitive().String(value)
     );
+    public static readonly Codec<Guid> Guid = new PrimitiveImplCodec<Guid>(
+        reader => new(Byte.FixedArray(16).ReadGeneric(reader)),
+        (writer, value) => Byte.FixedArray(16).WriteGeneric(writer, value.ToByteArray())
+    );
 }
 
 /// <summary>
@@ -114,6 +118,13 @@ public abstract record Codec<TValue> : Codec {
     /// <returns>The array codec</returns>
     public Codec<TValue[]> Array()
         => new ArrayCodec<TValue>(this);
+
+    /// <summary>
+    /// Creates a fixed-size array from the codec
+    /// </summary>
+    /// <returns>The array codec</returns>
+    public Codec<TValue[]> FixedArray(int length)
+        => new FixedArrayCodec<TValue>(this, length);
 
     public void Write(DataWriter writer, object? value)
         => WriteGeneric(writer, (TValue) value!);
@@ -224,6 +235,29 @@ public record ArrayCodec<TElement>(Codec<TElement> Codec) : Codec<TElement[]> {
     public override void WriteGeneric(DataWriter writer, TElement[] values) {
         using var arr = writer.Array(values.Length);
         for (int i = 0; i < values.Length; i++)
+            Codec.WriteGeneric(arr.Value(), values[i]);
+    }
+}
+
+/// <summary>
+/// A codec which acts as a fixed array of values
+/// </summary>
+/// <typeparam name="TElement"></typeparam>
+/// <param name="Codec"></param>
+public record FixedArrayCodec<TElement>(Codec<TElement> Codec, int Length) : Codec<TElement[]> {
+    public override TElement[] ReadGeneric(DataReader reader) {
+        using var arr = reader.FixedArray(Length);
+        var values = new TElement[Length];
+
+        for (int i = 0; i < Length; i++)
+            values[i] = Codec.ReadGeneric(arr.Value());
+
+        return values;
+    }
+
+    public override void WriteGeneric(DataWriter writer, TElement[] values) {
+        using var arr = writer.FixedArray(Length);
+        for (int i = 0; i < Length; i++)
             Codec.WriteGeneric(arr.Value(), values[i]);
     }
 }

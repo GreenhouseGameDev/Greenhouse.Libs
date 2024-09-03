@@ -3,6 +3,7 @@ namespace Greenhouse.Libs.Serialization;
 public interface DataWriter {
     public ObjectDataWriter Object(int keys);
     public ArrayDataWriter Array(int length);
+    public ArrayDataWriter FixedArray(int length);
     public PrimitiveDataWriter Primitive();
 }
 

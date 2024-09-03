@@ -17,6 +17,11 @@ public record JsonDataWriter(JsonWriter Json) : DataWriter {
         return new ArrayWriter(this);
     }
 
+    public ArrayDataWriter FixedArray(int length) {
+        Json.WriteStartArray();
+        return new ArrayWriter(this);
+    }
+
     private class ArrayWriter(JsonDataWriter writer) : ArrayDataWriter {
         private readonly JsonDataWriter Writer = writer;
 

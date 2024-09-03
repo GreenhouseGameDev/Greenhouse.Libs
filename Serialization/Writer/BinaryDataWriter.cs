@@ -5,12 +5,16 @@ public record BinaryDataWriter(BinaryWriter Binary) : DataWriter {
         Primitive().Int(length);
         return new ArrayWriter(this);
     }
+        
+    public ArrayDataWriter FixedArray(int length)
+        => new ArrayWriter(this);
 
     public ObjectDataWriter Object(int keys) {
         return new ObjectWriter(this);
     }
 
-    public PrimitiveDataWriter Primitive() => throw new NotImplementedException();
+    public PrimitiveDataWriter Primitive()
+        => new PrimitiveWriter(Binary);
 
     private record PrimitiveWriter(BinaryWriter Binary) : PrimitiveDataWriter {
         public void Bool(bool value)

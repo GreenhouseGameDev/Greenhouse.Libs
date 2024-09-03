@@ -3,6 +3,8 @@ namespace Greenhouse.Libs.Serialization.Reader;
 public record BinaryDataReader(BinaryReader Binary) : DataReader {
     public ArrayDataReader Array()
         => new ArrayReader(this, Primitive().Int());
+    public ArrayDataReader FixedArray(int length)
+        => new ArrayReader(this, length);
     public ObjectDataReader Object()
         => new ObjectReader(this);
     public PrimitiveDataReader Primitive()

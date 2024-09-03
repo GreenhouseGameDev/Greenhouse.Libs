@@ -3,6 +3,7 @@ namespace Greenhouse.Libs.Serialization;
 public interface DataReader {
     public ObjectDataReader Object();
     public ArrayDataReader Array();
+    public ArrayDataReader FixedArray(int length);
     public PrimitiveDataReader Primitive();
 }
 
