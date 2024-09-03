@@ -261,6 +261,9 @@ public record RecordCodec<TValue> : Codec<TValue> {
         Constructor = contructor;
     }
 
+    public static RecordCodec<TValue> Create(Func<TValue> constructor)
+        => new([], constructor);
+
     public static RecordCodec<TValue> Create<TParam1>(FieldCodec<TParam1, TValue> codec1, Func<TParam1, TValue> constructor)
         => new([codec1], constructor);
 
