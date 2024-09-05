@@ -113,6 +113,16 @@ public abstract record Codec<TValue> : Codec {
         => new NotNullFieldCodec<TValue, TParent>(this, name, getter);
 
     /// <summary>
+    /// Creates a defaulted field from the codec
+    /// </summary>
+    /// <typeparam name="TParent">The parent type of the field</typeparam>
+    /// <param name="name">The name of the field</param>
+    /// <param name="getter">A function to get the field from it's parent</param>
+    /// <returns>The field codec</returns>
+    public FieldCodec<TValue, TParent> DefaultedField<TParent>(string name, Func<TParent, TValue> getter, Func<TValue> defaultValue)
+        => new DefaultedFieldCodec<TValue, TParent>(this, name, getter, defaultValue);
+
+    /// <summary>
     /// Creates an array from the codec
     /// </summary>
     /// <returns>The array codec</returns>
@@ -339,6 +349,26 @@ public record NullableClassFieldCodec<TValue, TParent>(Codec<TValue> Codec, stri
             field.Null();
             return;
         }
+        Codec.WriteGeneric(field.NotNull(), value);
+    }
+}
+
+/// <summary>
+/// The defaulted generic version of FieldCodec
+/// </summary>
+/// <typeparam name="TValue">The value of the codec</typeparam>
+/// <typeparam name="TParent">The parent type for the codec</typeparam>
+/// <param name="Getter">A function to get the field from the parent</param>
+public record DefaultedFieldCodec<TValue, TParent>(Codec<TValue> Codec, string Name, Func<TParent, TValue> Getter, Func<TValue> Default) : FieldCodec<TValue, TParent>(Getter) {
+    public override TValue ReadGeneric(ObjectDataReader reader) {
+        using var maybe = reader.NullableField(Name);
+        if (maybe.IsNull())
+            return Default();
+        return Codec.ReadGeneric(maybe.NotNull());
+    }
+    
+    public override void WriteGeneric(ObjectDataWriter writer, TValue value) {
+        using var field = writer.NullableField(Name);
         Codec.WriteGeneric(field.NotNull(), value);
     }
 }

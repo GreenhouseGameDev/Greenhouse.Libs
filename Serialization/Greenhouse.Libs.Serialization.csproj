@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>library</OutputType>
-    <VersionPrefix>0.1.3</VersionPrefix>
+    <VersionPrefix>0.1.4</VersionPrefix>
     <RootNamespace>Greenhouse.Libs.Serialization</RootNamespace>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
