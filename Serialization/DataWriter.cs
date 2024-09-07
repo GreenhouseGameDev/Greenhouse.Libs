@@ -2,6 +2,7 @@ namespace Greenhouse.Libs.Serialization;
 
 public interface DataWriter {
     public ObjectDataWriter Object(int keys);
+    public MapDataWriter Map(int keys);
     public ArrayDataWriter Array(int length);
     public ArrayDataWriter FixedArray(int length);
     public PrimitiveDataWriter Primitive();
@@ -10,6 +11,16 @@ public interface DataWriter {
 public abstract class ObjectDataWriter : IDisposable {
     public abstract DataWriter Field(string name);
     public abstract NullableFieldDataWriter NullableField(string name);
+    public abstract void End();
+
+    public void Dispose() {
+        GC.SuppressFinalize(this);
+        End();
+    }
+}
+
+public abstract class MapDataWriter : IDisposable {
+    public abstract DataWriter Field(string name);
     public abstract void End();
 
     public void Dispose() {

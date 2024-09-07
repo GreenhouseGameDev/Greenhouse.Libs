@@ -16,6 +16,11 @@ public record BinaryDataWriter(BinaryWriter Binary) : DataWriter {
     public PrimitiveDataWriter Primitive()
         => new PrimitiveWriter(Binary);
 
+    public MapDataWriter Map(int keys) {
+        Primitive().Int(keys);
+        return new MapWriter(this);
+    }
+
     private record PrimitiveWriter(BinaryWriter Binary) : PrimitiveDataWriter {
         public void Bool(bool value)
             => Binary.Write(value);
@@ -43,6 +48,17 @@ public record BinaryDataWriter(BinaryWriter Binary) : DataWriter {
             => Binary.Write(value);
         public void UShort(ushort value)
             => Binary.Write(value);
+    }
+
+    private class MapWriter(BinaryDataWriter writer) : MapDataWriter {
+        private readonly BinaryDataWriter Writer = writer;
+
+        public override void End() {}
+
+        public override DataWriter Field(string name) {
+            Writer.Primitive().String(name);
+            return Writer;
+        }
     }
 
     private class ArrayWriter(BinaryDataWriter writer) : ArrayDataWriter {

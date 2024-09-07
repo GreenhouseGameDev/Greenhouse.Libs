@@ -15,6 +15,9 @@ public record StructuredObjectDataReader(StructuredValue Value) : DataReader {
     public ObjectDataReader Object()
         => new ObjectReader(this, (StructuredValue.Object) Value);
 
+    public MapDataReader Map()
+        => new MapReader(this, (StructuredValue.Object) Value);
+
     private class ObjectReader(StructuredObjectDataReader reader, StructuredValue.Object obj) : ObjectDataReader {
         private readonly StructuredObjectDataReader Reader = reader;
         private readonly StructuredValue.Object Obj = obj;
@@ -52,6 +55,23 @@ public record StructuredObjectDataReader(StructuredValue Value) : DataReader {
 
         public override DataReader NotNull() {
             throw new ArgumentException($"Field {FieldName} is null");
+        }
+    }
+
+    private class MapReader(StructuredObjectDataReader reader, StructuredValue.Object obj) : MapDataReader {
+        private readonly StructuredObjectDataReader Reader = reader;
+        private readonly StructuredValue.Object Obj = obj;
+        private int index = 0;
+
+        public override void End() {}
+
+        public override int Length()
+            => Obj.Values.Keys.Count;
+
+        public override DataReader Field(out string name) {
+            (name, var value) = Obj.Values.ElementAt(index);
+            index++;
+            return new StructuredObjectDataReader(value);
         }
     }
 

@@ -3,10 +3,16 @@ namespace Greenhouse.Libs.Serialization.Reader;
 public record BinaryDataReader(BinaryReader Binary) : DataReader {
     public ArrayDataReader Array()
         => new ArrayReader(this, Primitive().Int());
+
+    public MapDataReader Map()
+        => new MapReader(this, Primitive().Int());
+
     public ArrayDataReader FixedArray(int length)
         => new ArrayReader(this, length);
+
     public ObjectDataReader Object()
         => new ObjectReader(this);
+
     public PrimitiveDataReader Primitive()
         => new PrimitiveReader(Binary);
 
@@ -47,6 +53,19 @@ public record BinaryDataReader(BinaryReader Binary) : DataReader {
             => length;
         public override DataReader Value() 
             => Reader;
+    }
+
+    private class MapReader(BinaryDataReader reader, int length) : MapDataReader {
+        private readonly BinaryDataReader Reader = reader;
+
+        public override void End() {}
+
+        public override DataReader Field(out string name) {
+            name = Reader.Primitive().String();
+            return Reader;
+        }
+        public override int Length()
+            => length;
     }
 
     private class ObjectReader(BinaryDataReader reader) : ObjectDataReader {

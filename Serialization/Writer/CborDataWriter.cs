@@ -22,6 +22,11 @@ public record CborDataWriter(CborWriter Cbor) : DataWriter {
         return new ArrayWriter(this);
     }
 
+    public MapDataWriter Map(int keys) {
+        Cbor.WriteStartMap(keys);
+        return new MapWriter(this);
+    }
+
     private class ArrayWriter(CborDataWriter writer) : ArrayDataWriter {
         private readonly CborDataWriter Writer = writer;
 
@@ -30,6 +35,19 @@ public record CborDataWriter(CborWriter Cbor) : DataWriter {
         }
 
         public override DataWriter Value() {
+            return Writer;
+        }
+    }
+
+    private class MapWriter(CborDataWriter writer) : MapDataWriter {
+        private readonly CborDataWriter Writer = writer;
+
+        public override void End() {
+            Writer.Cbor.WriteEndMap();
+        }
+
+        public override DataWriter Field(string name) {
+            Writer.Cbor.WriteTextString(name);
             return Writer;
         }
     }

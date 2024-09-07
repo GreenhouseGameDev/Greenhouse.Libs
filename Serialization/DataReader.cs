@@ -4,12 +4,25 @@ public interface DataReader {
     public ObjectDataReader Object();
     public ArrayDataReader Array();
     public ArrayDataReader FixedArray(int length);
+    public MapDataReader Map();
     public PrimitiveDataReader Primitive();
 }
 
 public abstract class ObjectDataReader : IDisposable {
     public abstract DataReader Field(string name);
     public abstract NullableFieldDataReader NullableField(string name);
+    public abstract void End();
+
+    public void Dispose() {
+        GC.SuppressFinalize(this);
+        End();
+    }
+}
+
+public abstract class MapDataReader : IDisposable {
+    public abstract int Length();
+
+    public abstract DataReader Field(out string name);
     public abstract void End();
 
     public void Dispose() {

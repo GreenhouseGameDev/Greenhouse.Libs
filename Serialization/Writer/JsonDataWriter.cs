@@ -8,6 +8,11 @@ public record JsonDataWriter(JsonWriter Json) : DataWriter {
         return new ObjectWriter(this);
     }
 
+    public MapDataWriter Map(int keys) {
+        Json.WriteStartObject();
+        return new MapWriter(this);
+    }
+
     public PrimitiveDataWriter Primitive() {
         return new PrimitiveWriter(this);
     }
@@ -30,6 +35,19 @@ public record JsonDataWriter(JsonWriter Json) : DataWriter {
         }
 
         public override DataWriter Value() {
+            return Writer;
+        }
+    }
+
+    private class MapWriter(JsonDataWriter writer) : MapDataWriter {
+        private readonly JsonDataWriter Writer = writer;
+
+        public override void End() {
+            Writer.Json.WriteEndObject();
+        }
+
+        public override DataWriter Field(string name) {
+            Writer.Json.WritePropertyName(name);
             return Writer;
         }
     }
