@@ -62,6 +62,10 @@ public static class Codecs {
         reader => new(Byte.FixedArray(16).ReadGeneric(reader)),
         (writer, value) => Byte.FixedArray(16).WriteGeneric(writer, value.ToByteArray())
     );
+    public static readonly Codec<DateTime> DateTime = new PrimitiveImplCodec<DateTime>(
+        reader => new DateTime(reader.Primitive().Long()),
+        (writer, value) => writer.Primitive().Long(value.Ticks)
+    );
 }
 
 /// <summary>
